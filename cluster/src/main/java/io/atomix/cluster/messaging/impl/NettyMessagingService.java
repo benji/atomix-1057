@@ -21,6 +21,7 @@ import javax.net.ssl.TrustManagerFactory;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.MessageDigest;
@@ -93,6 +94,7 @@ public class NettyMessagingService implements ManagedMessagingService {
   private final Logger log = LoggerFactory.getLogger(getClass());
 
   private final Address returnAddress;
+  private Integer boundPort = null;
   private final int preamble;
   private final MessagingConfig config;
   private final ProtocolVersion protocolVersion;
@@ -569,9 +571,13 @@ public class NettyMessagingService implements ManagedMessagingService {
       String iface = ifaces.next();
       bootstrap.bind(iface, port).addListener((ChannelFutureListener) f -> {
         if (f.isSuccess()) {
-          log.info("TCP server listening for connections on {}:{}", iface, port);
-          serverChannel = f.channel();
-          bind(bootstrap, ifaces, port, future);
+          if (boundPort == null) {
+            serverChannel = f.channel();
+            InetSocketAddress localAddress = (InetSocketAddress) serverChannel.localAddress();
+            boundPort = localAddress.getPort();
+          }
+          log.info("TCP server listening for connections on {}:{}", iface, boundPort);
+          bind(bootstrap, ifaces, boundPort, future);
         } else {
           log.warn("Failed to bind TCP server to port {}:{} due to {}", iface, port, f.cause());
           future.completeExceptionally(f.cause());
@@ -847,5 +853,9 @@ public class NettyMessagingService implements ManagedMessagingService {
     public boolean acceptInboundMessage(Object msg) {
       return msg instanceof ProtocolMessage;
     }
+  }
+
+  public int getBoundPort() {
+    return boundPort;
   }
 }

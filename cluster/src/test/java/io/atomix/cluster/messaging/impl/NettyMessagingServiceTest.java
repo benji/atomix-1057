@@ -77,23 +77,29 @@ public class NettyMessagingServiceTest {
 
   @Before
   public void setUp() throws Exception {
-    address1 = Address.from(findAvailablePort(5001));
-    netty1 = (ManagedMessagingService) new NettyMessagingService("test", address1, new MessagingConfig()).start().join();
+    NettyMessagingService service1 = new NettyMessagingService("test", Address.from(0), new MessagingConfig());
+    netty1 = (ManagedMessagingService) service1.start().join();
+    address1 = Address.from(service1.getBoundPort());
 
-    address2 = Address.from(findAvailablePort(5002));
-    netty2 = (ManagedMessagingService) new NettyMessagingService("test", address2, new MessagingConfig()).start().join();
+    NettyMessagingService service2 = new NettyMessagingService("test", Address.from(0), new MessagingConfig());
+    netty2 = (ManagedMessagingService) service2.start().join();
+    address2 = Address.from(service2.getBoundPort());
 
-    addressv11 = Address.from(findAvailablePort(5003));
-    nettyv11 = (ManagedMessagingService) new NettyMessagingService("test", addressv11, new MessagingConfig(), ProtocolVersion.V1).start().join();
+    NettyMessagingService servicev11 = new NettyMessagingService("test", Address.from(0), new MessagingConfig(), ProtocolVersion.V1);
+    nettyv11 = (ManagedMessagingService) servicev11.start().join();
+    addressv11 = Address.from(servicev11.getBoundPort());
 
-    addressv12 = Address.from(findAvailablePort(5004));
-    nettyv12 = (ManagedMessagingService) new NettyMessagingService("test", addressv12, new MessagingConfig(), ProtocolVersion.V1).start().join();
+    NettyMessagingService servicev12 = new NettyMessagingService("test", Address.from(0), new MessagingConfig(), ProtocolVersion.V1);
+    nettyv12 = (ManagedMessagingService) servicev12.start().join();
+    addressv12 = Address.from(servicev12.getBoundPort());
 
-    addressv21 = Address.from(findAvailablePort(5005));
-    nettyv21 = (ManagedMessagingService) new NettyMessagingService("test", addressv21, new MessagingConfig(), ProtocolVersion.V2).start().join();
+    NettyMessagingService servicev21 = new NettyMessagingService("test", Address.from(0), new MessagingConfig(), ProtocolVersion.V2);
+    nettyv21 = (ManagedMessagingService) servicev21.start().join();
+    addressv21 = Address.from(servicev21.getBoundPort());
 
-    addressv22 = Address.from(findAvailablePort(5006));
-    nettyv22 = (ManagedMessagingService) new NettyMessagingService("test", addressv22, new MessagingConfig(), ProtocolVersion.V2).start().join();
+    NettyMessagingService servicev22 = new NettyMessagingService("test", Address.from(0), new MessagingConfig(), ProtocolVersion.V2);
+    nettyv22 = (ManagedMessagingService) servicev22.start().join();
+    addressv22 = Address.from(servicev22.getBoundPort());
 
     invalidAddress = Address.from(IP_STRING, 5007);
   }
